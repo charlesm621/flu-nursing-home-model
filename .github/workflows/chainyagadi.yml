@@ -1,0 +1,38 @@
+name: Chainguard Demo
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+on: [push]
+
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: arc-runner-set
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Pull base Chainguard image
+      run: docker pull chainguard/chainguard_image:latest
+
+    - name: Set up Miniconda and Nextflow
+      run: |
+        wget -O miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+        /bin/bash miniconda.sh -b -p /opt/conda
+        rm miniconda.sh
+        /opt/conda/bin/conda clean -tipsy
+        export PATH=/opt/conda/bin:$PATH
+        conda install -c bioconda nextflow
+
+    - name: Configure Docker client to use Minikube's Docker daemon
+      run: eval $(minikube docker-env)
+
+    - name: Build Docker image
+      run: docker build -t your_image_name .
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Push image to Docker Hub
+      run: docker push your_registry_username/your_image_name:latest
