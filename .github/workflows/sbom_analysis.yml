@@ -4,7 +4,7 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   generate_sbom:
-    runs-on: ubuntu-latest
+    runs-on: arc-runner-set
     name: "SBOM Generation"
     steps:
       - name: Checkout Repository
